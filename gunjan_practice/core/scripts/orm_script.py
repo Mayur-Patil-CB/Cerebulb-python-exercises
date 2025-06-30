@@ -6,13 +6,7 @@ from pprint import pprint
 
 
 def run():
-       restaurants = Restaurant.objects.filter(name__startswith='p')
-       print(restaurants)
-
-       print(restaurants.update(
-           date_opened=timezone.now() - timezone.timedelta(days=365),
-       ))
-        
+       Restaurant.objects.all().delete()
        print(connection.queries)
 
    
