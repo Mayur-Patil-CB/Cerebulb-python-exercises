@@ -1,25 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Rating Form</title>
-</head>
-<body>
-    <h2>Submit Your Rating</h2>
+{% extends 'core/base.html' %}
 
-    <form method="post">
-        {% csrf_token %}
 
-        <label for="id_restaurant">Restaurant:</label><br>
-        {{ form.restaurant }}<br><br>
+{% block content %}
 
-        <label for="id_user">User:</label><br>
-        {{ form.user }}<br><br>
+<!-- {% for restaurant in restaurants %}
+<p>{{ restaurant.name }}</p>
 
-        <label for="id_rating">Rating:</label><br>
-        {{ form.rating }}<br><br>
+<ul>
+    {% for rating  in restaurant.ratings.all %}
+    <li>{{rating.rating}}</li>
+    {% endfor %}
+</ul>
 
-        <button type="submit">Submit</button>
-    </form>
+<ul>
+    {% for sale  in restaurant.sales.all %}
+    <li>{{sale.income}}</li>
+    {% endfor %}
+</ul>
 
-</body>
-</html>
+{% endfor %} -->
+
+<!-- {% for rating in ratings %}
+<p>{{rating.restaurant.name}} - {{ rating }}</p>
+{% endfor %} -->
+
+{% endblock %}
