@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
-from core.models import Restaurant,Rating,Sale
+from core.models import Restaurant,Rating,Sale,Staff,StaffRestaurant
 from django.utils import timezone
 from django.db import connection
 from pprint import pprint
 from django.db.models.functions import Lower
+import random
 
 #creating recors by save method 
 # def run():
@@ -155,10 +156,55 @@ from django.db.models.functions import Lower
 #     pprint(connection.queries)
 
 # Filtering by foreignkeys values
+# def run():
+#     ratings = Rating.objects.filter(restaurant__name__startswith='P')
+#     print(ratings)
+#     pprint(connection.queries)
+
+#Chapter 7
 def run():
-    ratings = Rating.objects.filter(restaurant__name__startswith='P')
-    print(ratings)
-    pprint(connection.queries)
+    # staff,created = Staff.objects.get_or_create(name = 'John Doe')
+    # staff.restaurants.set(Restaurant.objects.all()[:10])
+    # add,all,count,remove,set,clear,create,filter
+    
+    # staff.restaurants.remove(Restaurant.objects.first())
+    # staff.restaurants.set(Restaurant.objects.all()[:5])
+    # staff.restaurants.clear()
+    # italian = staff.restaurants.filter(restaurant_type=Restaurant.TypeChoices.ITALIAN)
+    # print(italian)
+    
+    # restaurant = Restaurant.objects.get(pk=23)
+    # print(restaurant.staff_set.all())
+    
+    staff,created = Staff.objects.get_or_create(name = 'John Doe')
+    # restaurant = Restaurant.objects.first()
+    # staff.restaurants.clear()
+    # restaurant = Restaurant.objects.last()
+    
+    # StaffRestaurant.objects.create(
+    #     staff=staff, restaurant=restaurant, salary=28_000
+    # )
+    # StaffRestaurant.objects.create(
+    #     staff=staff, restaurant=restaurant, salary=24_000
+    # )
+    
+    # staff_restaurants = StaffRestaurant.objects.filter(staff=staff)
+    # for s in staff_restaurants:
+    #     print(s.salary)
+    # staff.restaurants.add(restaurant,through_defaults={'salary':28_000})
+    
+    staff.restaurants.set(
+        Restaurant.objects.all()[:10],
+        through_defaults={'salary': random.randint(20_000,80_000)}
+    )
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 
