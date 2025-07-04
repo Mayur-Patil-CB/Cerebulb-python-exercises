@@ -26,6 +26,8 @@ class Restaurant(models.Model):
     latitude = models.FloatField(validators=[MinValueValidator(-90), MaxValueValidator(90)])
     longitude = models.FloatField(validators=[MinValueValidator(-180), MaxValueValidator(180)])
     restaurant_type = models.CharField(max_length=2, choices=TypeChoices.choices ,null=True, blank=True)
+    capacity = models.PositiveSmallIntegerField(null=True , blank=True)
+    nickname = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
         ordering = [Lower('name')]  # Orders by name in lowercase

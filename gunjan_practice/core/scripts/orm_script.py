@@ -1,14 +1,14 @@
 from django.contrib.auth.models import User
 from core.models import Restaurant, Rating ,Sale,Staff , StaffRestaurant
 from django.utils import timezone
-from django.db.models.functions import Upper , Length,Concat
-from django.db.models import Count,Avg,Min,Max,Sum,CharField,Value , F,Q
+from django.db.models.functions import Upper , Length,Concat, Coalesce
+from django.db.models import Count,Avg,Min,Max,Sum,CharField,Value , F,Q,Case,When
 from django.db import connection
 from pprint import pprint
 import random
 
 def run():
-       pass
+
        # multiple AND conditions with filter method
        # chinese =Restaurant.TypeChoices.CHINESE
        # restaurants = Restaurant.objects.filter(restaurant_type=chinese , name__startswith ='C')
@@ -277,5 +277,117 @@ def run():
        # profited = Q(income__gt=F('expenditure'))
        # sales = Sale.objects.select_related('restaurant').filter(name_has_num | profited)
        # print(sales)
+
+# chapter 12
+
+       # querying null data with "isnull" lookup
+       # restaurant = Restaurant.objects.first()
+       # restaurant2 = Restaurant.objects.last()
+
+       # restaurant.capacity = 10
+       # restaurant2.capacity = 20
+       # restaurant.save()
+       # restaurant2.save()
+
+       # print(Restaurant.objects.filter(capacity__isnull=True))
+
+       # Ordering with null values in Django with order_by function 
+       # print(
+       #        Restaurant.objects.order_by(F('capacity').asc(nulls_last=True)).values('capacity')
+       # )
+       # 2
+       # print(
+       #        Restaurant.objects.filter(capacity__isnull=False).order_by('-capacity').values('capacity')
+       # )
+
+       # COALESCE function in django and databases
+       # print(
+       #        Restaurant.objects.aggregate(total_cap=Coalesce(Sum('capacity'),0))
+       # )
+
+       # with coalesce
+       # print(Rating.objects.filter(rating__lt=0).aggregate(total=Coalesce(Avg('rating'),0.0 )))
+       # without coalesce
+       # print(Rating.objects.filter(rating__lt=0).aggregate(total=Avg('rating', default= 0.0 )))
+       
+       # coalesce with F expression
+       # r = Restaurant.objects.first()
+       # r.nickname = 'abcd'
+       # r.save()
+
+       # print(
+       #        Restaurant.objects.annotate(
+       #               name_value=Coalesce(F('nickname'),F('name'))
+       #        ).values('name_value')
+       # )
+
+# chapter 13
+       # conditional expressions using Case() and When() objects
+       # italian = Restaurant.TypeChoices.ITALIAN
+
+       # restaurants = Restaurant.objects.annotate(
+       #        is_italian=Case(
+       #               When(restaurant_type=italian, then=True),
+       #                             default=False           
+       #   )
+       # )
+       # print(
+       #    restaurants.filter(is_italian=True)     
+       # )
+
+
+       # italian = Restaurant.TypeChoices.ITALIAN
+
+       # restaurants = Restaurant.objects.annotate(nsales=Count('sales'))
+       # restaurants = restaurants.annotate(
+       #        is_popular=Case(
+       #               When(nsales__gt=8, then=True),
+       #               default=False
+       #        )
+       # )
+
+       # print(restaurants.values('nsales','is_popular'))
+
+       # restaurant average rating > 3.5
+       # restaurant has more than 1 rating
+
+       # annotate restaurants with average rating and number of ratings
+       # restaurants = Restaurant.objects.annotate(
+       #        avg=Avg('ratings__rating'),
+       #        num_ratings=Count('ratings__pk')
+       # )
+       
+       # restaurants = restaurants.annotate(
+       #        rating_bucket=Case(
+       #               When(avg__gt=3.5, then=Value('Highly Rated')),
+       #               When(avg__range=(2.5,3.5), then = Value('Average Rating')),
+       #               When(avg__lt=2.5, then=Value('Bad Rated')),
+       #        )
+       # )
+
+       # print(
+       #        restaurants.filter(rating_bucket='Bad Rated')
+       # )
+
+       # assign a continent to each restaurant                   
+       types = Restaurant.TypeChoices
+
+       european = Q(restaurant_type=types.ITALIAN) | Q(restaurant_type=types.GREEK)
+       asian = Q(restaurant_type=types.INDIAN) | Q(restaurant_type=types.CHINESE)
+       north_american = Q(north_american , then=Value)
+
+
+       restaurants = Restaurant.objects.annotate(
+              continent=Case(
+                     When(Q(restaurant_type=types.ITALIAN) | Q(restaurant_type=types.GREEK), then=Value("Europe")),
+                     When(Q(restaurant_type=types.INDIAN) | Q(restaurant_type=types.CHINESE), then=Value("Aisa")),
+                     When(restaurant_type=types.MEXICAN ,then=Value("North America")),
+                     default=Value("N/A")
+
+              )
+       )
+       print(restaurants.filter(continent="Aisa"))
+
        # pprint(connection.queries)
+
 
